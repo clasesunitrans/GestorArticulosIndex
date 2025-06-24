@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Google Sheets</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div id="app-container">
+        <header>
+            <h1>Proyecto de traducción - Artículos en revistas indexadas</h1>
+            <nav id="sheet-tabs-container"></nav>
+        </header>
+
+        <main id="main-content">
+            <div class="controls-container">
+                <button id="add-new-record-btn" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+                      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+                    </svg>
+                    Añadir Nuevo Registro
+                </button>
+            </div>
+            <div id="table-container">
+                <table id="data-table">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para crear/editar registros -->
+    <div id="form-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <button id="close-modal-btn" class="close-button">&times;</button>
+            <h2 id="modal-title"></h2>
+            <form id="record-form">
+                <input type="hidden" id="record-id" name="recordId">
+                <div id="form-fields"></div>
+                <div class="form-actions">
+                    <button type="button" id="cancel-btn" class="btn btn-secondary">Cancelar</button>
+                    <button type="submit" id="save-btn" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal de confirmación para eliminar -->
+    <div id="confirm-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h2 id="confirm-title">Confirmar Acción</h2>
+            <p id="confirm-message">¿Estás seguro?</p>
+            <div class="form-actions">
+                <button id="confirm-cancel-btn" class="btn btn-secondary">Cancelar</button>
+                <button id="confirm-ok-btn" class="btn btn-danger">Sí, Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor para notificaciones/mensajes -->
+    <div id="toast-container"></div>
+
+    <!-- Indicador de Carga -->
+    <div id="loader" class="loader-overlay" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
