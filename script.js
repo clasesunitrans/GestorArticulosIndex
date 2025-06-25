@@ -1,10 +1,8 @@
-
-    //const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwAfh1KmSeHYgoRmJ9uUM54iSWl80YBtcQb0oWfR4TDcHLBLSFnY9yPw4iMcRopvUCJ/exec';
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- CONFIGURATION ---
     // !!! IMPORTANTE: Pega aquí la URL de tu Web App de Google Apps Script !!!
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwAfh1KmSeHYgoRmJ9uUM54iSWl80YBtcQb0oWfR4TDcHLBLSFnY9yPw4iMcRopvUCJ/exec';
+    const WEB_APP_URL = 'URL_DE_TU_WEB_APP_AQUI';
 
     // --- STATE ---
     let currentSheetName = '';
@@ -51,13 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 4000);
     };
 
-    /**
-     * Makes a fetch request to the Google Apps Script backend.
-     * @param {string} endpoint - The base URL of the web app.
-     * @param {string} method - 'GET' or 'POST'.
-     * @param {object} params - For GET, an object of URL parameters. For POST, the body object.
-     * @returns {Promise<any>} The JSON response data.
-     */
     const callAppsScript = async (endpoint, method = 'GET', params = {}) => {
         showLoader(true);
         try {
@@ -71,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     method: 'POST',
                     mode: 'cors',
                     cache: 'no-cache',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Required for Apps Script POST from browser
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify(params),
                     redirect: 'follow'
                 });
@@ -92,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error al llamar a Apps Script:', error);
             showToast(error.message, 'error');
-            return null; // Return null to indicate failure
+            return null;
         } finally {
             showLoader(false);
         }
@@ -111,7 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
             sheetTabsContainer.appendChild(tab);
         });
 
-        // Set the first tab as active
         if (sheetNames.length > 0) {
             const firstTab = sheetTabsContainer.querySelector('.sheet-tab');
             firstTab.classList.add('active');
@@ -121,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const renderTable = () => {
-        // Render headers
+        // Render headers for desktop
         tableHead.innerHTML = '';
         const headerRow = document.createElement('tr');
         sheetHeaders.forEach(header => {
@@ -138,12 +128,14 @@ document.addEventListener('DOMContentLoaded', () => {
         tableBody.innerHTML = '';
         sheetData.forEach(rowObject => {
             const tr = document.createElement('tr');
-            tr.dataset.rowIndex = rowObject.rowIndex; // Store the 1-based row index
+            tr.dataset.rowIndex = rowObject.rowIndex;
 
-            rowObject.data.forEach(cellData => {
+            rowObject.data.forEach((cellData, index) => {
                 const td = document.createElement('td');
-                // Format date for display if it looks like a date string from ISO
-                 if (typeof cellData === 'string' && cellData.match(/^\d{4}-\d{2}-\d{2}T/)) {
+                // *** CHANGE: Add data-label attribute for responsive view ***
+                td.dataset.label = sheetHeaders[index];
+                
+                if (typeof cellData === 'string' && cellData.match(/^\d{4}-\d{2}-\d{2}T/)) {
                     td.textContent = new Date(cellData).toLocaleDateString();
                 } else {
                     td.textContent = cellData;
@@ -151,12 +143,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 tr.appendChild(td);
             });
             
-            // Actions cell
             const actionsTd = document.createElement('td');
             actionsTd.className = 'actions-cell';
             actionsTd.innerHTML = `
-                <button class="btn btn-edit">Editar</button>
-                <button class="btn btn-delete">Eliminar</button>
+                <div>
+                    <button class="btn btn-edit">Editar</button>
+                    <button class="btn btn-delete">Eliminar</button>
+                </div>
             `;
             tr.appendChild(actionsTd);
             tableBody.appendChild(tr);
@@ -175,17 +168,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let fieldValue = value;
             if (isDate && value) {
-                // Attempt to format various common date strings to YYYY-MM-DD
                 try {
-                    // Handles 'M/D/YYYY', 'D-M-YYYY', etc. and ISO strings
                     const dateObj = new Date(value);
-                    // Check if the date is valid
                     if (!isNaN(dateObj.getTime())) {
-                       // Adjust for timezone offset before converting to ISO string
                        const timezoneOffset = dateObj.getTimezoneOffset() * 60000;
                        fieldValue = new Date(dateObj.getTime() - timezoneOffset).toISOString().split('T')[0];
                     } else {
-                       fieldValue = value; // Keep original if parsing fails
+                       fieldValue = value;
                     }
                 } catch(e) {
                     console.warn("Could not parse date:", value);
@@ -200,7 +189,6 @@ document.addEventListener('DOMContentLoaded', () => {
             formFields.appendChild(formGroup);
         });
     };
-
 
     // --- DATA FETCHING & MANIPULATION ---
 
@@ -222,7 +210,6 @@ document.addEventListener('DOMContentLoaded', () => {
             sheetData = data.rows;
             renderTable();
         } else {
-            // Clear table on error
             sheetHeaders = [];
             sheetData = [];
             renderTable();
@@ -235,7 +222,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const rowData = sheetHeaders.map(header => formData.get(header));
         const recordId = recordIdInput.value;
 
-        let result;
         const action = recordId ? 'update' : 'create';
         const payload = {
             action,
@@ -246,12 +232,12 @@ document.addEventListener('DOMContentLoaded', () => {
             payload.rowIndex = recordId;
         }
 
-        result = await callAppsScript(WEB_APP_URL, 'POST', payload);
+        const result = await callAppsScript(WEB_APP_URL, 'POST', payload);
 
         if (result) {
             showToast(result.message || 'Operación completada.');
             closeFormModal();
-            fetchAndRenderData(currentSheetName); // Refresh table
+            fetchAndRenderData(currentSheetName);
         }
     };
     
@@ -285,7 +271,6 @@ document.addEventListener('DOMContentLoaded', () => {
         confirmModal.style.display = 'flex';
         setTimeout(() => confirmModal.classList.add('visible'), 10);
 
-        // This clone-and-replace is to remove any previous event listeners
         const newOkBtn = confirmOkBtn.cloneNode(true);
         confirmOkBtn.parentNode.replaceChild(newOkBtn, confirmOkBtn);
         
@@ -352,7 +337,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Listeners for the confirmation modal
     confirmCancelBtn.addEventListener('click', closeConfirmModal);
     confirmModal.addEventListener('click', (e) => {
         if (e.target === confirmModal) {
