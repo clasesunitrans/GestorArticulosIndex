@@ -141,13 +141,14 @@ header h1 {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1rem;
+    table-layout: fixed; /* Prevents columns from resizing erratically */
 }
 
 #data-table th, #data-table td {
     padding: 12px 15px;
     border: 1px solid var(--border-color);
     text-align: left;
-    word-wrap: break-word;
+    word-wrap: break-word; /* Allow content to wrap */
 }
 
 #data-table thead {
@@ -156,6 +157,13 @@ header h1 {
 
 #data-table th {
     font-weight: 700;
+}
+
+/* Set last column (actions) to a fixed width */
+#data-table th:last-child,
+#data-table td:last-child {
+    width: 140px; /* Adjust as needed */
+    text-align: center;
 }
 
 #data-table tbody tr:nth-child(even) {
@@ -167,14 +175,10 @@ header h1 {
 }
 
 td.actions-cell {
-    white-space: nowrap;
-    width: 1%;
-}
-
-td.actions-cell div {
     display: flex;
     gap: 10px;
-    justify-content: flex-start;
+    justify-content: center;
+    flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
 }
 
 /* Modal Styles */
@@ -192,14 +196,13 @@ td.actions-cell div {
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
-    padding: 1rem;
 }
 
 .modal-content {
     background-color: white;
     padding: 2rem;
     border-radius: 8px;
-    width: 100%;
+    width: 90%;
     max-width: 500px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     position: relative;
@@ -300,14 +303,12 @@ td.actions-cell div {
 /* Toast/Notification Styles */
 #toast-container {
     position: fixed;
-    bottom: 10px;
-    left: 10px;
-    right: 10px;
+    bottom: 20px;
+    right: 20px;
     z-index: 3000;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    align-items: center;
 }
 
 .toast {
@@ -316,16 +317,14 @@ td.actions-cell div {
     color: white;
     box-shadow: var(--shadow);
     opacity: 0;
-    width: 100%;
-    max-width: 400px;
-    transform: translateY(100%);
-    animation: slideInUp 0.5s forwards;
+    transform: translateX(100%);
+    animation: slideIn 0.5s forwards;
 }
 
-@keyframes slideInUp {
+@keyframes slideIn {
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateX(0);
     }
 }
 
@@ -335,85 +334,4 @@ td.actions-cell div {
 
 .toast.error {
     background-color: var(--danger-color);
-}
-
-/* --- RESPONSIVE STYLES --- */
-@media screen and (max-width: 768px) {
-    #app-container {
-        margin: 1rem;
-        padding: 1rem;
-    }
-
-    header h1 {
-        font-size: 1.5rem;
-    }
-
-    .btn {
-        padding: 12px 15px;
-        font-size: 0.9rem;
-    }
-
-    .controls-container {
-        display: flex;
-    }
-
-    #add-new-record-btn {
-        width: 100%;
-        justify-content: center;
-    }
-
-    /* Responsive Table Transformation */
-    #table-container {
-        overflow-x: hidden;
-    }
-
-    #data-table {
-        border: none;
-    }
-
-    #data-table thead {
-        display: none; /* Ocultar encabezados de la tabla */
-    }
-
-    #data-table tr {
-        display: block;
-        margin-bottom: 1rem;
-        border: 1px solid var(--border-color);
-        border-radius: 5px;
-        padding: 1rem;
-    }
-
-    #data-table td {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        text-align: right;
-        border: none;
-        border-bottom: 1px solid #eee;
-        padding: 10px 0;
-    }
-
-    #data-table td:last-child {
-        border-bottom: none;
-    }
-
-    #data-table td::before {
-        content: attr(data-label);
-        font-weight: bold;
-        text-align: left;
-        padding-right: 1rem;
-    }
-
-    td.actions-cell {
-        padding-top: 1rem;
-    }
-    
-    td.actions-cell::before {
-       display: none; /* No mostrar label para la celda de acciones */
-    }
-
-    td.actions-cell div {
-        width: 100%;
-        justify-content: flex-end;
-    }
 }
