@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- CONFIGURATION ---
     // !!! IMPORTANTE: Pega aquí la URL de tu Web App de Google Apps Script !!!
-    const WEB_APP_URL = 'URL_DE_TU_WEB_APP_AQUI';
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwAfh1KmSeHYgoRmJ9uUM54iSWl80YBtcQb0oWfR4TDcHLBLSFnY9yPw4iMcRopvUCJ/exec';
 
     // --- STATE ---
     let currentSheetName = '';
